@@ -1,0 +1,84 @@
+{
+ "src": "Vizard.pine",
+ "out": "HM_Vizard.pine",
+ "lib": "HM_Vizard",
+ "header": [
+  "Vizard as a library for Hueco Mundo: Models 9 (FOMC day) and 10 (Pesquisa, FOMC day 1), with the Fed card and map.",
+  "Generated from Vizard.pine by pine2lib.py; edit Vizard.pine and regenerate."
+ ],
+ "feed": {
+  "ADRtd": "float",
+  "wO": "float",
+  "wH": "float",
+  "wL": "float",
+  "wC": "float",
+  "dxL": "float",
+  "mtH": "float",
+  "mtL": "float",
+  "mtO": "float",
+  "dxA": "float",
+  "dx20": "float",
+  "vxC": "float",
+  "vxA": "float",
+  "beat": "int",
+  "ZQF": "array<float>"
+ },
+ "types": {
+  "cDxc": "color",
+  "lp_": "float",
+  "lm_": "float",
+  "ld_": "float",
+  "ls_": "float",
+  "la_": "float",
+  "lw_": "float",
+  "cFd": "color",
+  "EV_N": "int",
+  "MB_N": "int"
+ },
+ "drop": [
+  "^varip int beat = 0",
+  "^if barstate\\.isrealtime",
+  "^adrCalc\\(",
+  "^mtd\\(",
+  "^athD\\("
+ ],
+ "pre": [
+  [
+   "    fdZ.set(i, request.security(fdTk(i), fdTf, close, ignore_invalid_symbol = true))",
+   "    fdZ.set(i, ZQF.get(i))"
+  ],
+  [
+   "if barstate.isfirst and showSg\n",
+   "if (barstate.islast and __ON__) and na(TV) and showSg\n"
+  ],
+  [
+   "if barstate.isfirst and showMap\n",
+   "if (barstate.islast and __ON__) and na(TFM) and showMap\n"
+  ],
+  [
+   "if barstate.isfirst\n    if showEv\n",
+   "if (barstate.islast and __ON__)\n    if showEv and na(TS)\n"
+  ],
+  [
+   "    if showCk\n        tkO := ",
+   "    if showCk and na(TK)\n        tkO := "
+  ],
+  [
+   "    if showFd\n        tfO := ",
+   "    if showFd and na(TF)\n        tfO := "
+  ]
+ ],
+ "tail": [
+  "// @function The day this module's cards read (yyyymmdd): today's trading day when it is one of its days, else the next.",
+  "export nextDay(State hmS, Cfg hmC, Feed hmF) =>",
+  "    [k_, now_, d_] = ownProfile(hmS.tdK, hmS.tdPK, hmS.tdK)",
+  "    d_"
+ ],
+ "splits": [
+  [
+   "drawCore2",
+   "        // ── clock card"
+  ]
+ ],
+ "max_step": 90
+}

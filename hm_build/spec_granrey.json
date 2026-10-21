@@ -1,0 +1,68 @@
+{
+ "src": "Gran_Rey_Cero.pine",
+ "out": "HM_GranRey.pine",
+ "lib": "HM_GranRey",
+ "header": [
+  "Gran Rey Cero as a library for Hueco Mundo: Models 7–8, CPI day and the day after, with the PO3 candles and VIX / DXY cards.",
+  "Generated from Gran_Rey_Cero.pine by pine2lib.py; edit Gran_Rey_Cero.pine and regenerate."
+ ],
+ "feed": {
+  "ADR": "float",
+  "ADRtd": "float",
+  "dx4": "float",
+  "wO": "float",
+  "wH": "float",
+  "wL": "float",
+  "wC": "float",
+  "dxL": "float",
+  "vTC": "int",
+  "vC0": "float",
+  "vC1": "float",
+  "vS0": "float",
+  "vS1": "float",
+  "vixL": "float",
+  "dTC": "int",
+  "dA0": "float",
+  "dA1": "float",
+  "yTC": "int",
+  "yC0": "float",
+  "yC1": "float",
+  "ylL": "float",
+  "moH": "float",
+  "moL": "float",
+  "beat": "int",
+  "nqO": "float",
+  "nqW": "float",
+  "esO": "float",
+  "esW": "float",
+  "ryO": "float",
+  "ryW": "float"
+ },
+ "types": {
+  "cDxc": "color",
+  "EV_N": "int",
+  "MB_N": "int"
+ },
+ "drop": [
+  "^varip int beat = 0",
+  "^if barstate\\.isrealtime",
+  "^adrCalc\\(",
+  "^mtd\\(",
+  "^athD\\(",
+  "^wkOpenF\\(",
+  "^idxTk\\("
+ ],
+ "pre": [
+  [
+   "if barstate.isfirst\n    int o = gapOf(\"Price chart\", crdPos) ? 1 : 0",
+   "if (barstate.islast and __ON__) and na(TS) and na(TM) and na(TK)\n    int o = gapOf(\"Price chart\", crdPos) ? 1 : 0"
+  ]
+ ],
+ "tail": [
+  "// @function The day this module's cards read (yyyymmdd): today's trading day when it is one of its days, else the next.",
+  "export nextDay(State hmS, Cfg hmC, Feed hmF) =>",
+  "    [k_, now_, d_] = ownProfile(hmS.tdK, hmS.tdPK, hmS.tdK)",
+  "    d_"
+ ],
+ "max_step": 90
+}

@@ -1,0 +1,85 @@
+{
+ "src": "Hollow.pine",
+ "out": "HM_Hollow.pine",
+ "lib": "HM_Hollow",
+ "header": [
+  "Hollow as a library for Hueco Mundo: Models 11 (NFP week) and 12 (Full Bringer, the day after FOMC).",
+  "Generated from Hollow.pine by pine2lib.py; edit Hollow.pine and regenerate."
+ ],
+ "feed": {
+  "ADRtd": "float",
+  "wO": "float",
+  "wH": "float",
+  "wL": "float",
+  "wC": "float",
+  "dxL": "float",
+  "mtH": "float",
+  "mtL": "float",
+  "mtO": "float",
+  "dxA": "float",
+  "dx20": "float",
+  "vxC": "float",
+  "vxA": "float",
+  "beat": "int"
+ },
+ "types": {
+  "cDxc": "color",
+  "lp_": "float",
+  "lm_": "float",
+  "ld_": "float",
+  "ls_": "float",
+  "la_": "float",
+  "lw_": "float",
+  "cFd": "color",
+  "EV_N": "int",
+  "MB_N": "int"
+ },
+ "drop": [
+  "^varip int beat = 0",
+  "^if barstate\\.isrealtime",
+  "^adrCalc\\(",
+  "^mtd\\(",
+  "^athD\\("
+ ],
+ "pre": [
+  [
+   "if barstate.isfirst and showSg\n",
+   "if (barstate.islast and __ON__) and na(TV) and showSg\n"
+  ],
+  [
+   "if barstate.isfirst and showSh\n",
+   "if (barstate.islast and __ON__) and na(TH) and showSh\n"
+  ],
+  [
+   "if barstate.isfirst\n    if showEv\n",
+   "if (barstate.islast and __ON__)\n    if showEv and na(TS)\n"
+  ],
+  [
+   "    if showCk\n        tkO := ",
+   "    if showCk and na(TK)\n        tkO := "
+  ],
+  [
+   "bool mkN = NP.includes(calK) and mod <= 510 and mod + tfM > 510",
+   "bool mkN = not skipNfpMark and NP.includes(calK) and mod <= 510 and mod + tfM > 510"
+  ]
+ ],
+ "tail": [
+  "// @function The day this module's cards read (yyyymmdd): today's trading day when it is one of its days, else the next.",
+  "export nextDay(State hmS, Cfg hmC, Feed hmF) =>",
+  "    [k_, now_, d_] = ownProfile(hmS.tdK, hmS.tdPK, hmS.tdK)",
+  "    d_"
+ ],
+ "extra_inputs": {
+  "skipNfpMark": [
+   "bool",
+   "false"
+  ]
+ },
+ "splits": [
+  [
+   "drawCore2",
+   "        // ── clock card"
+  ]
+ ],
+ "max_step": 90
+}

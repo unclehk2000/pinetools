@@ -1,0 +1,77 @@
+{
+ "src": "Desgarron.pine",
+ "out": "HM_Desgarron.pine",
+ "lib": "HM_Desgarron",
+ "header": [
+  "Desgarrón as a library for Hueco Mundo: Model 6, NFP day.",
+  "Generated from Desgarron.pine by pine2lib.py; edit Desgarron.pine and regenerate."
+ ],
+ "feed": {
+  "ADRtd": "float",
+  "wO": "float",
+  "wH": "float",
+  "wL": "float",
+  "wC": "float",
+  "dxL": "float",
+  "mtH": "float",
+  "mtL": "float",
+  "mtO": "float",
+  "dxA": "float",
+  "dx20": "float",
+  "vxC": "float",
+  "vxA": "float",
+  "athP": "float",
+  "athPT": "int",
+  "beat": "int"
+ },
+ "types": {
+  "cDxc": "color",
+  "lp_": "float",
+  "lm_": "float",
+  "ld_": "float",
+  "ls_": "float",
+  "la_": "float",
+  "lw_": "float",
+  "cFd": "color",
+  "EV_N": "int",
+  "MB_N": "int"
+ },
+ "drop": [
+  "^varip int beat = 0",
+  "^if barstate\\.isrealtime",
+  "^adrCalc\\(",
+  "^mtd\\(",
+  "^athD\\("
+ ],
+ "pre": [
+  [
+   "if barstate.isfirst and showSg\n",
+   "if (barstate.islast and __ON__) and na(TV) and showSg\n"
+  ],
+  [
+   "if barstate.isfirst and showHy\n",
+   "if (barstate.islast and __ON__) and na(TH) and showHy\n"
+  ],
+  [
+   "if barstate.isfirst\n    if showEv\n",
+   "if (barstate.islast and __ON__)\n    if showEv and na(TS)\n"
+  ],
+  [
+   "    if showCk\n        tkO := ",
+   "    if showCk and na(TK)\n        tkO := "
+  ]
+ ],
+ "tail": [
+  "// @function The day this module's cards read (yyyymmdd): today's trading day when it is one of its days, else the next.",
+  "export nextDay(State hmS, Cfg hmC, Feed hmF) =>",
+  "    [k_, now_, d_] = ownProfile(hmS.tdK, hmS.tdPK, hmS.tdK)",
+  "    d_"
+ ],
+ "splits": [
+  [
+   "drawCore2",
+   "        // ── clock card"
+  ]
+ ],
+ "max_step": 90
+}
