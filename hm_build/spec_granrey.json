@@ -36,7 +36,8 @@
   "esO": "float",
   "esW": "float",
   "ryO": "float",
-  "ryW": "float"
+  "ryW": "float",
+  "adrD": "float"
  },
  "types": {
   "cDxc": "color",

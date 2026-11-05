@@ -20,7 +20,8 @@
   "dx20": "float",
   "vxC": "float",
   "vxA": "float",
-  "beat": "int"
+  "beat": "int",
+  "adrD": "float"
  },
  "types": {
   "cDxc": "color",

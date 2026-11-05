@@ -21,7 +21,8 @@
   "vxC": "float",
   "vxA": "float",
   "beat": "int",
-  "ZQF": "array<float>"
+  "ZQF": "array<float>",
+  "adrD": "float"
  },
  "types": {
   "cDxc": "color",

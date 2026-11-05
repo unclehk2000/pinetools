@@ -1,10 +1,17 @@
 """Build Hueco Mundo: the four calendar libraries (via pine2lib.py) and the indicator that imports them.
-python3 make_hm.py"""
+HM_SRC=folder/with/the/four/modules HM_OUT=output/folder python3 make_hm.py
+
+The modules are first prepared by prep.py (their own card-corner rule comes out; Hueco Mundo places the cards itself)
+into HM_OUT/pre, and the libraries are built from those copies."""
 import json, re, subprocess, sys
 import os
 HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.environ.get('HM_SRC', os.path.join(HERE, 'src'))        # folder with Desgarron.pine, Gran_Rey_Cero.pine, Vizard.pine, Hollow.pine
 OUTDIR = os.environ.get('HM_OUT', HERE)                          # where the libraries and Hueco_Mundo.pine are written
+sys.path.insert(0, HERE)
+import prep
+SRC = prep.prepare(SRC, os.path.join(OUTDIR, 'pre'))             # pine2lib reads the prepared copies
+os.environ['HM_SRC'] = SRC
 exec(open(os.path.join(HERE, 'pine2lib.py')).read().split("if __name__ == '__main__':")[0])
 
 USER = 'Unclehk2000'
@@ -25,7 +32,7 @@ MODS = [  # key, alias, library, name, spec, pane map, findings-position input, 
          bgs=[('bg0', 'settlement window 16:15–17:00'), ('bg1', 'NY AM, the day after FOMC')]),
 ]
 SHARED = ['clkMet', 'themeI', 'layI', 'crdSzI', 'anchorI', 'markEv', 'markD', 'kBands', 'kRef', 'kPast', 'showEv', 'crdPos', 'talN',
-          'showCk', 'ckOn', 'ckPos', 'dxySym', 'vixSym', 'ylSym', 'showSg', 'sgOn', 'sgPos', 'fdRoot']
+          'showCk', 'ckOn', 'ckPos', 'dxySym', 'vixSym', 'ylSym', 'showSg', 'sgOn', 'sgPos', 'fdRoot', 'txtM', 'txtCh', 'txtCd']
 DEFAULT_OVERRIDE = {('G', 'winDays'): '"CPI days and the day after"', ('G', 'txOth'): '""'}
 POS8 = '["Top left", "Top center", "Top right", "Middle left", "Middle right", "Bottom left", "Bottom center", "Bottom right"]'
 
@@ -81,6 +88,8 @@ def cfg_new(m, L, names):
         else:
             v = names[n]
         args.append('%s = %s' % (n, v))
+    PLACED = {'crdPos': 'crdPosE', 'ckPos': 'ckPosE', 'sgPos': 'sgPosE', 'fdgPos': 'fdgPosE', 'v_fdPos': 'fdPosE'}   # corners after the rule
+    args = [re.sub(r'= (\w+)$', lambda mm: '= ' + PLACED.get(mm.group(1), mm.group(1)), a) for a in args]
     return 'var %s.Cfg c%s = %s.Cfg.new(%s)' % (m['a'], m['k'], m['a'], ', '.join(args))
 
 
@@ -126,6 +135,9 @@ w('clkMet  = input.string("Range", "Clock measure", options = ["Range", "Net mov
 w('themeI  = input.string("Auto", "Theme", options = ["Auto", "Dark", "Light"], group = grpW, tooltip = "Auto follows the chart background.", display = display.none)')
 w('layI    = input.string("Desktop", "Layout", options = ["Desktop", "Mobile"], group = grpW, tooltip = "Desktop: every row. Mobile: narrow cards for a phone screen; the full wording stays in the tooltips.", display = display.none)')
 w('crdSzI  = input.string("Small", "Card text", options = ["Tiny", "Small", "Normal"], group = grpW, display = display.none)')
+w('txtM    = input.string("Auto (theme)", "Text colour", options = ["Auto (theme)", "Custom"], group = grpW, inline = "tx", tooltip = "Auto: white text on a dark background, black on a light one. Custom: your own colours, for backgrounds where the automatic choice clashes: chart = the labels that follow the chart background, card = the card text.", display = display.none)')
+w('txtCh   = input.color(#131722, "chart", group = grpW, inline = "tx", active = txtM == "Custom", display = display.none)')
+w('txtCd   = input.color(#131722, "card", group = grpW, inline = "tx", active = txtM == "Custom", display = display.none)')
 w('')
 w('grpO = "Modules"')
 for m in MODS:
@@ -189,6 +201,8 @@ for fn in ('dateKey', 'anchorKey', 'inWin', 'winBars', 'adrCalc', 'mtd', 'athD')
 w('AN = anchorI == "Trading day (18:00)" ? 0 : anchorI == "NY midnight" ? 1 : 2')
 w('string tfI = timeframe.isintraday ? timeframe.period : "D"')
 w('[ADR, ADRtd] = request.security(syminfo.tickerid, "15", [adrCalc(AN), adrCalc(0)])')
+w('// ADR20 of the trading day from daily bars (as Kyōka); the 15-minute figure above is the fallback and serves the other anchors')
+w('float adrD = request.security(ticker.modify(syminfo.tickerid, backadjustment = backadjustment.off), "D", ta.sma((high - low) / open, 20)[1], lookahead = barmerge.lookahead_on)')
 w('[wO, wH, wL, wC] = request.security(syminfo.tickerid, "W", [open, high, low, close], lookahead = barmerge.lookahead_on)')
 w('[moH, moL] = request.security(syminfo.tickerid, "M", [high, low], lookahead = barmerge.lookahead_on)')
 w('[mtH, mtL, mtO] = request.security(syminfo.tickerid, "D", mtd(), lookahead = barmerge.lookahead_on)')
@@ -235,6 +249,29 @@ w('// drawings placed by bar_index are anchored through `time`; a 1-minute tradi
 w('max_bars_back(time, 5000)')
 w('')
 w('// ═══════════════════════════════════════════════════════════════ Modules')
+CORNER = """// ── card corners: TradingView keeps one table per corner, so two cards set to the same corner of the same surface would
+// draw over each other. Each later card moves to the first free corner (tally, stages, clock and Fed card on the price chart;
+// findings, stages and clock in the pane), in the order of the list below. Rule after the GXV / El3mentss rework's table
+// handling, written from scratch.
+cornerOf(array<string> used, string want, bool on) =>
+    string out = want
+    if on
+        if used.includes(want)
+            for c in array.from("Top center", "Bottom center", "Middle right", "Middle left", "Bottom right", "Bottom left", "Top left", "Top right")
+                if not used.includes(c)
+                    out := c
+                    break
+        used.push(out)
+    out
+var array<string> cUsedP = array.new<string>()
+var array<string> cUsedI = array.new<string>()
+var string crdPosE = cornerOf(cUsedP, crdPos, showEv)
+var string sgPosE  = cornerOf(sgOn == "Price chart" ? cUsedP : cUsedI, sgPos, showSg)
+var string ckPosE  = cornerOf(ckOn == "Price chart" ? cUsedP : cUsedI, ckPos, showCk)
+var string fdPosE  = cornerOf(cUsedP, v_fdPos, v_showFd)
+var string fdgPosE = cornerOf(cUsedI, fdgPos, true)
+"""
+out.extend(CORNER.split('\n'))
 for m in MODS:
     L = libs[m['k']]
     w('// ── %s' % m['name'])
@@ -308,6 +345,13 @@ for i, m in enumerate(MODS, 1):
     for n in ('KT', 'RT'):
         w('        dropLb(%s)' % sp(m['k'], n))
     w('        dropB(%s)' % sp(m['k'], 'RB'))
+    for n in L.state:                              # Gran Rey Cero's live PO3 objects go with the rest when it stops being followed
+        if n == 'LVL':
+            w('        dropL(%s)' % sp(m['k'], n))
+        if n == 'LVT':
+            w('        dropLb(%s)' % sp(m['k'], n))
+        if n == 'LVB':
+            w('        dropB(%s)' % sp(m['k'], n))
 w('')
 w('// the rest of each module: structure, clock, cards')
 for m in MODS:

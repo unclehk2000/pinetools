@@ -22,7 +22,8 @@
   "vxA": "float",
   "athP": "float",
   "athPT": "int",
-  "beat": "int"
+  "beat": "int",
+  "adrD": "float"
  },
  "types": {
   "cDxc": "color",
