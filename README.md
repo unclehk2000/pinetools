@@ -14,7 +14,7 @@ python3 pine_main.py MyIndicator.pine 10         # the heaviest global statement
 python3 pine_funcs.py MyIndicator.pine           # per-function size and state
 python3 pine_calls.py MyIndicator.pine           # call and argument counts
 python3 pine_flat.py main.pine flat.pine --lib MyLib=MyLib.pine   # paste libraries in for a type check before publishing them
-./parse_all.sh *.pine                            # syntax check, two scripts at a time (needs pynescript)
+bash parse_all.sh *.pine                         # syntax check, two scripts at a time (needs pynescript)
 python3 house/audit.py folder/                   # the house standard: settings, text colour, unused code, candles, structure
 python3 house/audit.py --check folder/           # the same, exits 1 if anything is off (a gate before delivery)
 python3 house/sweep.py --audit MyIndicator.pine  # remove what the audit reports as unused
